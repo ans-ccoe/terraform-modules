@@ -31,7 +31,7 @@ There is the option to create a "default route" which routes all IPs (0.0.0.0/0)
 |------|-------------|------|---------|:--------:|
 | <a name="input_name"></a> [name](#input\_name) | Name of the Route Table | `string` | n/a | yes |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | The name of the resource group this module will use. | `string` | n/a | yes |
-| <a name="input_default_route"></a> [default\_route](#input\_default\_route) | Configuration for the default route. | <pre>object({<br>    name = optional(string, "default-route")<br>    ip   = string<br>  })</pre> | `null` | no |
+| <a name="input_default_route"></a> [default\_route](#input\_default\_route) | Configuration for the default route. | <pre>object({<br>    name                   = optional(string, "default-route")<br>    next_hop_type          = optional(string, "VirtualAppliance")<br>    next_hop_in_ip_address = optional(string)<br>  })</pre> | `null` | no |
 | <a name="input_disable_bgp_route_propagation"></a> [disable\_bgp\_route\_propagation](#input\_disable\_bgp\_route\_propagation) | Disable Route Propagation for the Route Table. True = Disabled | `bool` | `true` | no |
 | <a name="input_location"></a> [location](#input\_location) | The location of created resources. | `string` | `"uksouth"` | no |
 | <a name="input_routes"></a> [routes](#input\_routes) | Details of a route to be added to the Route Table with the name of the route as the key. | <pre>map(object({<br>    address_prefix         = string<br>    next_hop_type          = optional(string, "VirtualAppliance")<br>    next_hop_in_ip_address = optional(string)<br>  }))</pre> | `{}` | no |
@@ -43,6 +43,7 @@ There is the option to create a "default route" which routes all IPs (0.0.0.0/0)
 | Name | Description |
 |------|-------------|
 | <a name="output_bgp_route_propagation_enabled"></a> [bgp\_route\_propagation\_enabled](#output\_bgp\_route\_propagation\_enabled) | The output of whether BGP Route Propagation is enabled or not. |
+| <a name="output_id"></a> [id](#output\_id) | ID of the route table. |
 | <a name="output_resource_group"></a> [resource\_group](#output\_resource\_group) | The output of the resource group. |
 | <a name="output_route_table"></a> [route\_table](#output\_route\_table) | The output of the route table resource. |
 | <a name="output_routes"></a> [routes](#output\_routes) | The output of routes. |

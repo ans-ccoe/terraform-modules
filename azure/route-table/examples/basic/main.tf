@@ -62,6 +62,6 @@ module "route-table" {
   subnet_ids = [module.network.subnets["snet-prod"].id]
 
   default_route = {
-    ip = "1.2.3.4"
+    next_hop_in_ip_address = "1.2.3.4"
   }
 }

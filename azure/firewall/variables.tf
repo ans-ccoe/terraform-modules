@@ -94,6 +94,38 @@ variable "firewall_policy_id" {
 
 variable "zone_redundant" {
   description = "Specifies whether or not the Firewall is Zone Redundant."
-  type = bool
-  default = true
+  type        = bool
+  default     = true
+}
+
+variable "route_table_name" {
+  description = "The name of the route table to be created for the AzureFirewallSubnet."
+  type        = string
+  default     = null
+}
+
+variable "default_route_name" {
+  description = "The name of the default route."
+  type        = string
+  default     = "default-route"
+}
+
+variable "extra_routes" {
+  description = "Routes to add to a custom route table."
+  type = map(object({
+    address_prefix         = string
+    next_hop_type          = optional(string, "VirtualAppliance")
+    next_hop_in_ip_address = optional(string)
+  }))
+  default = {}
+
+  validation {
+    error_message = "Value for next_hop_in_ip_address be valid IPv4 CIDR."
+    condition     = alltrue([for v in var.extra_routes : can(cidrhost(v.address_prefix, 0))])
+  }
+
+  validation {
+    error_message = "Value for next_hop_in_ip_address must be a valid IPv4 address."
+    condition     = alltrue([for v in var.extra_routes : can(cidrhost("${v.next_hop_in_ip_address}/32", 0))])
+  }
 }

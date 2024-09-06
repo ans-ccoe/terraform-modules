@@ -17,3 +17,13 @@ output "private_ip" {
   description = "The private IP Address of the firewall"
   value       = one(azurerm_firewall.main.ip_configuration[*].private_ip_address)
 }
+
+output "subnet" {
+  description = "The attributes of the created subnet"
+  value       = azurerm_subnet.main
+}
+
+output "route_table" {
+  description = "The attributes of the route table."
+  value       = one(module.route-table[*])
+}

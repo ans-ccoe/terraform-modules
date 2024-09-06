@@ -22,11 +22,6 @@ output "firewall" {
   value       = local.firewall
 }
 
-output "default_route_table" {
-  description = "Default route table passing traffic through the firewall."
-  value       = local.firewall_route_table
-}
-
 output "bastion" {
   description = "Output from the bastion module."
   value       = local.bastion
@@ -54,5 +49,15 @@ output "private_resolver_outbound_endpoint" {
 
 output "network_watcher" {
   description = "Output of the network watcher."
-  value       = one(azurerm_network_watcher.main)
+  value       = one(azurerm_network_watcher.main[*])
+}
+
+output "extra_subnets_route_table" {
+  description = "Details about the Route Table created for extra subnets."
+  value       = local.extra_subnets_route_table
+}
+
+output "extra_subnets_network_security_group" {
+  description = "Details about the NSG created for extra subnets."
+  value = local.extra_subnets_network_security_group
 }

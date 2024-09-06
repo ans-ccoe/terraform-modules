@@ -29,7 +29,7 @@ Things to update:
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 3.22 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 3.93 |
 
 ## Inputs
 
@@ -41,13 +41,16 @@ Things to update:
 | <a name="input_subnet_address_prefixes"></a> [subnet\_address\_prefixes](#input\_subnet\_address\_prefixes) | The subnet used for the firewall must have the name `AzureFirewallSubnet` and a subnet mask of at least /26 | `list(string)` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags applied to created resources. | `map(string)` | n/a | yes |
 | <a name="input_virtual_network_name"></a> [virtual\_network\_name](#input\_virtual\_network\_name) | Name of your Azure Virtual Network | `string` | n/a | yes |
+| <a name="input_default_route_name"></a> [default\_route\_name](#input\_default\_route\_name) | The name of the default route. | `string` | `"default-route"` | no |
+| <a name="input_extra_routes"></a> [extra\_routes](#input\_extra\_routes) | Routes to add to a custom route table. | <pre>map(object({<br>    address_prefix         = string<br>    next_hop_type          = optional(string, "VirtualAppliance")<br>    next_hop_in_ip_address = optional(string)<br>  }))</pre> | `{}` | no |
 | <a name="input_firewall_dns_servers"></a> [firewall\_dns\_servers](#input\_firewall\_dns\_servers) | List of DNS Servers for Firewall config | `list(string)` | `null` | no |
 | <a name="input_firewall_policy_id"></a> [firewall\_policy\_id](#input\_firewall\_policy\_id) | The ID of the Firewall Policy applied to this Firewall | `string` | `null` | no |
 | <a name="input_firewall_sku_name"></a> [firewall\_sku\_name](#input\_firewall\_sku\_name) | Properties relating to the SKU Name of the Firewall | `string` | `"AZFW_VNet"` | no |
 | <a name="input_firewall_sku_tier"></a> [firewall\_sku\_tier](#input\_firewall\_sku\_tier) | Properties relating to the SKU Tier of the Firewall | `string` | `"Standard"` | no |
-| <a name="input_firewall_zones"></a> [firewall\_zones](#input\_firewall\_zones) | Specifies a list of Availability Zones in which this Azure Firewall should be located. | `list(string)` | `null` | no |
 | <a name="input_pip_name"></a> [pip\_name](#input\_pip\_name) | Name of the firewall's public IP | `string` | `null` | no |
 | <a name="input_private_ip_ranges"></a> [private\_ip\_ranges](#input\_private\_ip\_ranges) | A list of SNAT private CIDR IP ranges, or the special string IANAPrivateRanges, which indicates Azure Firewall does not SNAT when the destination IP address is a private range per IANA RFC 1918. | `list(string)` | `null` | no |
+| <a name="input_route_table_name"></a> [route\_table\_name](#input\_route\_table\_name) | The name of the route table to be created for the AzureFirewallSubnet. | `string` | `null` | no |
+| <a name="input_zone_redundant"></a> [zone\_redundant](#input\_zone\_redundant) | Specifies whether or not the Firewall is Zone Redundant. | `bool` | `true` | no |
 
 ## Outputs
 
@@ -57,6 +60,8 @@ Things to update:
 | <a name="output_name"></a> [name](#output\_name) | The name of the Azure Firewall. |
 | <a name="output_private_ip"></a> [private\_ip](#output\_private\_ip) | The private IP Address of the firewall |
 | <a name="output_public_ip"></a> [public\_ip](#output\_public\_ip) | The public IP Address of firewall. |
+| <a name="output_route_table"></a> [route\_table](#output\_route\_table) | The attributes of the route table. |
+| <a name="output_subnet"></a> [subnet](#output\_subnet) | The attributes of the created subnet |
 
 ## Resources
 
@@ -65,10 +70,13 @@ Things to update:
 | [azurerm_firewall.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/firewall) | resource |
 | [azurerm_public_ip.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
 | [azurerm_subnet.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
+| [azurerm_location.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/location) | data source |
 
 ## Modules
 
-No modules.
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_route-table"></a> [route-table](#module\_route-table) | ../route-table | n/a |
 <!-- END_TF_DOCS -->
 _______________
 | Classified  |

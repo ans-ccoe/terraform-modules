@@ -124,7 +124,7 @@ variable "rule_collection_groups" {
       action      = string
       priority    = number
       rules = map(object({
-        protocols             = optional(map(string)) #Http, Https
+        protocols             = optional(map(string), {}) #Http, Https
         source_addresses      = optional(list(string))
         source_ip_groups      = optional(list(string))
         destination_addresses = optional(list(string))

@@ -9,7 +9,7 @@ provider "azurerm" {
 locals {
   location = "uksouth"
   tags = {
-    module     = "hub-hub-example"
+    module     = "hub-example"
     example    = "basic"
     usage      = "demo"
     department = "technical"
@@ -30,35 +30,35 @@ module "hub" {
   address_space = ["10.0.0.0/16"]
   extra_subnets = {
     "snet-hub" = {
-      prefix = "10.0.0.0/24"
+      address_prefix = "10.0.1.0/24"
     }
   }
 
-  firewall_config = {
-    name          = "fw-hub-${local.resource_prefix}"
-    subnet_prefix = "10.0.15.192/26"
+  firewall = {
+    name           = "fw-hub-${local.resource_prefix}"
+    address_prefix = "10.0.0.0/26"
   }
 
-  bastion_config = {
-    name          = "bas-hub-${local.resource_prefix}"
-    subnet_prefix = "10.0.15.0/26"
+  bastion = {
+    name                  = "bas-hub-${local.resource_prefix}"
+    address_prefix        = "10.0.0.64/27"
+    create_resource_group = false
   }
 
   # Commented out as this takes ~30 mins to deploy.  Uncomment if specifically testing VNGs
 
-  # virtual_network_gateway_config = {
+  # virtual_network_gateway = {
   #   name          = "vpngw-hub-${local.resource_prefix}"
-  #   subnet_prefix = "10.0.15.128/26"
+  #   address_prefix = "10.0.0.96/27"
   # }
 
-  private_resolver_config = {
-    name                   = "dnspr-hub-${local.resource_prefix}"
-    inbound_subnet_prefix  = "10.0.14.224/28"
-    outbound_subnet_prefix = "10.0.14.240/28"
+  private_resolver = {
+    name                    = "dnspr-hub-${local.resource_prefix}"
+    inbound_address_prefix  = "10.0.0.128/28"
+    outbound_address_prefix = "10.0.0.144/28"
   }
 
-  network_watcher_config = {
-    name                = "nw_uks-${local.resource_prefix}"
-    resource_group_name = "rg-nw-${local.resource_prefix}"
-  }
+  enable_network_watcher = false
+  # network_watcher_name                = "nw_uks-${local.resource_prefix}"
+  # network_watcher_resource_group_name = "rg-nw-${local.resource_prefix}"
 }

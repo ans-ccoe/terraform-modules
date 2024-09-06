@@ -36,8 +36,8 @@ resource "azurerm_route" "default" {
   route_table_name    = azurerm_route_table.main.name
 
   address_prefix         = "0.0.0.0/0"
-  next_hop_type          = "VirtualAppliance"
-  next_hop_in_ip_address = var.default_route.ip
+  next_hop_type          = var.default_route.next_hop_type
+  next_hop_in_ip_address = var.default_route.next_hop_in_ip_address
 }
 
 ##########################

@@ -22,10 +22,17 @@ module "network" {
   tags                = var.tags
 
   address_space = var.address_space
+
+  dns_servers       = var.dns_servers != "" ? var.dns_servers : []
+  include_azure_dns = var.include_azure_dns
+
+  ddos_protection_plan_id = var.ddos_protection_plan_id
+  bgp_community           = var.bgp_community
+
   subnets = merge(
     local.enable_private_endpoint_subnet ? {
       (var.private_endpoint_subnet["subnet_name"]) = {
-        prefix                                        = var.private_endpoint_subnet["subnet_prefix"]
+        prefix                                        = var.private_endpoint_subnet["address_prefix"]
         service_endpoints                             = var.private_endpoint_subnet["service_endpoints"]
         private_endpoint_network_policies_enabled     = false
         private_link_service_network_policies_enabled = false
@@ -34,25 +41,27 @@ module "network" {
 
     # The firewall subnet is managed by the module found in firewall.tf
     #   count  = local.enable_firewall ? 1 : 0
-    #   subnet_address_prefixes = [var.firewall_config["subnet_prefix"]
+    #   subnet_address_prefixes = [var.firewall["address_prefix"]
 
     local.enable_bastion ? {
       "AzureBastionSubnet" = {
-        prefix = var.bastion_config["subnet_prefix"]
+        prefix = var.bastion["address_prefix"]
       }
     } : {},
 
     local.enable_virtual_network_gateway ? {
       "GatewaySubnet" = {
-        prefix = var.virtual_network_gateway_config["subnet_prefix"]
+        prefix         = var.virtual_network_gateway["address_prefix"]
+        associate_rt   = local.use_virtual_network_gateway_route_table ? true : null
+        route_table_id = local.use_virtual_network_gateway_route_table ? one(azurerm_route_table.virtual_network_gateway[*].id) : null
       }
     } : {},
 
     local.enable_private_resolver ? {
-      (var.private_resolver_config["inbound_subnet_name"]) = {
-        prefix         = var.private_resolver_config["inbound_subnet_prefix"]
+      (var.private_resolver["inbound_subnet_name"]) = {
+        prefix         = var.private_resolver["inbound_address_prefix"]
         associate_rt   = local.enable_firewall
-        route_table_id = one(azurerm_route_table.firewall[*].id)
+        route_table_id = module.route_table.route_table.id
         delegations = {
           private-resolver = {
             service = "Microsoft.Network/dnsResolvers"
@@ -60,10 +69,10 @@ module "network" {
           }
         }
       },
-      (var.private_resolver_config["outbound_subnet_name"]) = {
-        prefix         = var.private_resolver_config["outbound_subnet_prefix"]
+      (var.private_resolver["outbound_subnet_name"]) = {
+        prefix         = var.private_resolver["outbound_address_prefix"]
         associate_rt   = local.enable_firewall
-        route_table_id = one(azurerm_route_table.firewall[*].id)
+        route_table_id = module.route_table.route_table.id
         delegations = {
           private-resolver = {
             service = "Microsoft.Network/dnsResolvers"
@@ -72,37 +81,14 @@ module "network" {
         }
       },
     } : {},
-    {
-      for k, v in var.extra_subnets
-      : k => merge(v, {
-        associate_rt   = local.enable_firewall
-        route_table_id = azurerm_route_table.firewall[0].id
-      })
-    }
+    local.extra_subnets
   )
 
-  peer_networks = {
-    for spoke, id in var.spoke_networks
-    : spoke => {
-      id                    = id
-      allow_gateway_transit = local.enable_virtual_network_gateway
+  private_dns_zones = {
+    for k, zone in var.private_dns_zones
+    : k => {
+      resource_group_name  = zone.resource_group_name != null ? zone.resource_group_name : azurerm_resource_group.main.name
+      registration_enabled = zone.registration_enabled
     }
   }
-
-  private_dns_zones = {
-    for zone in azurerm_private_dns_zone.main
-    : zone.name => { resource_group_name = zone.resource_group_name }
-  }
-}
-
-#############
-# Private DNS
-#############
-
-resource "azurerm_private_dns_zone" "main" {
-  for_each = var.private_dns_domains
-
-  name                = each.key
-  resource_group_name = azurerm_resource_group.main.name
-  tags                = var.tags
 }

@@ -3,6 +3,11 @@ output "resource_group" {
   value       = azurerm_route_table.main.resource_group_name
 }
 
+output "id" {
+  description = "ID of the route table."
+  value       = azurerm_route_table.main.id
+}
+
 output "route_table" {
   description = "The output of the route table resource."
   value       = azurerm_route_table.main

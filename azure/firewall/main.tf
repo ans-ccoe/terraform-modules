@@ -42,3 +42,22 @@ resource "azurerm_firewall" "main" {
     public_ip_address_id = azurerm_public_ip.main.id
   }
 }
+
+module "route-table" {
+  source = "../route-table"
+  count  = var.route_table_name != null ? 1 : 0
+
+  name                = var.route_table_name != null ? var.route_table_name : "rt-${azurerm_firewall.main.name}"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  tags                = var.tags
+
+  subnet_ids = [azurerm_subnet.main.id]
+
+  default_route = {
+    name          = var.default_route_name
+    next_hop_type = "Internet"
+  }
+
+  routes = var.extra_routes
+}
